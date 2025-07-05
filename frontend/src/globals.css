@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+}
+:root {
+	--primary-color: 248, 249, 255;
+	--secondary-color: 12, 12, 12;
+	--accent-color: 162, 148, 249;
+	/* buttons */
+	--button-background: 162, 148, 249;
+}
+
+.dark {
+	--primary-color: 12, 12, 12;
+	--secondary-color: 248, 249, 255;
+	--accent-color: 162, 148, 249;
+
+	/* buttons */
+	--button-background: 162, 148, 249;
+	/* borders */
+	--border-color: 39, 39, 42;
+}
+
+@theme {
+	--color-primary: rgb(var(--primary-color));
+	--color-secondary: rgb(var(--secondary-color));
+	--color-accent: rgb(var(--accent-color));
+	--color-button: rgb(var(--button-background));
+	--color-border: rgb(var(--border-color));
+	--font-inter: "Inter", sans-serif;
+}
