@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "../Navbar";
 import { Outlet } from "react-router";
-import Sidebar from "../ui/Sidebar";
+import Sidebar from "../Sidebar";
 const MainLayout = () => {
 	return (
 		<div className="w-screen h-screen overflow-hidden">

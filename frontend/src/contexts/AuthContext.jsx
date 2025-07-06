@@ -7,10 +7,8 @@ export const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState(() => localStorage.getItem("token"));
 	const queryClient = useQueryClient();
 
-	const {
-		data: user,
-		isLoading,
-	} = useQuery({
+	// ✅ Get current user if token exists
+	const { data: user, isLoading } = useQuery({
 		queryKey: ["me"],
 		queryFn: async () => {
 			if (!token) return null;
@@ -27,16 +25,28 @@ export const AuthProvider = ({ children }) => {
 		refetchOnWindowFocus: false,
 	});
 
+	// ✅ Login mutation with safe error handling
 	const loginMutation = useMutation({
 		mutationFn: async ({ email, password }) => {
-			const res = await fetch("/api/v1/auth/login", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, password }),
-			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || "Login failed");
-			return data;
+			try {
+				const res = await fetch("/api/v1/auth/login", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email, password }),
+				});
+
+				let data = {};
+				try {
+					data = await res.json();
+				} catch {
+					throw new Error("Server error. Please try again later.");
+				}
+
+				if (!res.ok) throw new Error(data.error || "Login failed");
+				return data;
+			} catch (err) {
+				throw new Error(err.message || "Network error");
+			}
 		},
 		onSuccess: (data) => {
 			localStorage.setItem("token", data.token);
@@ -45,16 +55,28 @@ export const AuthProvider = ({ children }) => {
 		},
 	});
 
+	// ✅ Register mutation with safe error handling
 	const registerMutation = useMutation({
 		mutationFn: async ({ username, password }) => {
-			const res = await fetch("/api/v1/auth/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ username, password }),
-			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || "Registration failed");
-			return data;
+			try {
+				const res = await fetch("/api/v1/auth/register", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, password }),
+				});
+
+				let data = {};
+				try {
+					data = await res.json();
+				} catch {
+					throw new Error("Server error. Please try again later.");
+				}
+
+				if (!res.ok) throw new Error(data.error || "Registration failed");
+				return data;
+			} catch (err) {
+				throw new Error(err.message || "Network error");
+			}
 		},
 		onSuccess: (data) => {
 			localStorage.setItem("token", data.token);
@@ -63,6 +85,7 @@ export const AuthProvider = ({ children }) => {
 		},
 	});
 
+	// ✅ Logout
 	const logout = () => {
 		localStorage.removeItem("token");
 		setToken(null);
@@ -71,15 +94,15 @@ export const AuthProvider = ({ children }) => {
 
 	return (
 		<AuthContext.Provider
-	value={{
-		user,
-		isLoading,
-		login: loginMutation, 
-		register: registerMutation,
-		logout,
-	}}
->
-{children}
+			value={{
+				user,
+				isLoading,
+				login: loginMutation,
+				register: registerMutation,
+				logout,
+			}}
+		>
+			{children}
 		</AuthContext.Provider>
 	);
 };

@@ -9,12 +9,16 @@ export const createPost = async (req, res) => {
 	const file = req.file;
 
 	if (!title || !content || !file) {
-		return res.status(400).json({ error: "Title, content, and image are required" });
+		return res
+			.status(400)
+			.json({ error: "Title, content, and image are required" });
 	}
 
 	try {
 		// Step 1: Convert to WebP
-		const webpBuffer = await sharp(file.buffer).webp({ lossless: true }).toBuffer();
+		const webpBuffer = await sharp(file.buffer)
+			.webp({ lossless: true })
+			.toBuffer();
 
 		// Step 2: Upload to Firebase
 		const filename = `${Date.now()}-${uuidv4()}.webp`;
@@ -36,9 +40,10 @@ export const createPost = async (req, res) => {
 		});
 
 		blobStream.on("finish", async () => {
-			const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filename)}?alt=media`;
+			const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${
+				bucket.name
+			}/o/${encodeURIComponent(filename)}?alt=media`;
 
-			// Step 3: Create post in DB
 			const post = await Post.create({
 				user: userId,
 				title,
