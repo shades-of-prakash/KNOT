@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState(() => localStorage.getItem("token"));
 	const queryClient = useQueryClient();
 
-	// ✅ Get current user if token exists
 	const { data: user, isLoading } = useQuery({
 		queryKey: ["me"],
 		queryFn: async () => {
@@ -24,8 +23,6 @@ export const AuthProvider = ({ children }) => {
 		enabled: !!token,
 		refetchOnWindowFocus: false,
 	});
-
-	// ✅ Login mutation with safe error handling
 	const loginMutation = useMutation({
 		mutationFn: async ({ email, password }) => {
 			try {
@@ -85,7 +82,6 @@ export const AuthProvider = ({ children }) => {
 		},
 	});
 
-	// ✅ Logout
 	const logout = () => {
 		localStorage.removeItem("token");
 		setToken(null);

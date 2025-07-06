@@ -29,7 +29,7 @@ function App() {
 										</div>
 									}
 								/>
-							</Route>
+							</Route> 
 							<Route path="/login" element={<Login />} />
 							<Route path="/signup" element={<Signup />} />
 							<Route path="*" element={<div>404 - Page Not Found</div>} />
