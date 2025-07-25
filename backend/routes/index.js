@@ -1,7 +1,7 @@
 // routes/index.js
 import express from "express";
-import authRoutes from "./authRoutes.js";
-import postRoutes from "./postRoutes.js"; // ✅ import it
+import authRoutes from "./userRoutes.js";
+import postRoutes from "./postRoutes.js";
 
 const router = express.Router();
 

@@ -1,23 +1,24 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getStorage } from "firebase/storage"; 
-import dotenv from "dotenv"
+// import admin from "firebase-admin";
+// import dotenv from "dotenv";
+// dotenv.config();
 
+// // Parse service account JSON from env string
+// const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+
+// admin.initializeApp({
+// 	credential: admin.credential.cert(serviceAccount),
+// 	storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+// });
+
+// export const bucket = admin.storage().bucket();
+
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
 dotenv.config();
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+export const supabase = createClient(
+	process.env.SUPABASE_URL,
+	process.env.SUPABASE_ANON_KEY
+);
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: "svgs-405d5.firebaseapp.com",
-  projectId: "svgs-405d5",
-  storageBucket: "svgs-405d5.appspot.com",
-  messagingSenderId: "670144861835",
-  appId: "1:670144861835:web:8418208e9f8ec831f3668e"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const bucket = getStorage(app);
+export const profileBucket = supabase.storage.from("profiles");

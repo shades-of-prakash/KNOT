@@ -7,7 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
 const Login = () => {
-	const [email, setEmail] = useState("");
+	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const { login } = useAuth();
 	const navigate = useNavigate();
@@ -15,8 +15,10 @@ const Login = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		console.log(username);
+		console.log(password);
 		try {
-			await login.mutateAsync({ email, password });
+			await login.mutateAsync({ username, password });
 			navigate("/");
 		} catch (_) {}
 	};
@@ -39,8 +41,8 @@ const Login = () => {
 							<input
 								type="text"
 								placeholder="Username"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
+								value={username}
+								onChange={(e) => setUsername(e.target.value)}
 								required
 								className="w-full bg-transparent p-4 rounded-full border border-black/50 focus:outline-none focus:border-2 focus:border-violet-600"
 							/>

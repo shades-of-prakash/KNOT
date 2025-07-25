@@ -3,9 +3,17 @@ import mongoose from "mongoose";
 const postSchema = new mongoose.Schema(
 	{
 		user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-		title: { type: String, required: true },
-		content: { type: String, required: true }, // rich text HTML
-		image: { type: String, required: true },   // Firebase public URL
+		content: { type: String, required: true },
+		images: [{ type: String }],
+		upvotes: { type: Number, default: 0 },
+		downvotes: { type: Number, default: 0 },
+		comments: [
+			{
+				user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+				text: { type: String, required: true },
+				createdAt: { type: Date, default: Date.now },
+			},
+		],
 	},
 	{ timestamps: true }
 );

@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { X } from "lucide-react";
-
+import { useNavigate } from "react-router";
+import { useAuth } from "../contexts/AuthContext"; // adjust if needed
+import { toast } from "sonner";
 function EditableInput({ value, onChange, placeholder = "What’s happening?" }) {
 	const ref = useRef();
 
@@ -24,7 +26,7 @@ function EditableInput({ value, onChange, placeholder = "What’s happening?" })
 				onInput={handleInput}
 				className="w-full min-h-[36px] text-white outline-none whitespace-pre-wrap break-words"
 				suppressContentEditableWarning={true}
-		 />
+			/>
 			{!value?.trim() && (
 				<div className="absolute top-0 left-0 pointer-events-none text-gray-500">
 					{placeholder}
@@ -34,16 +36,21 @@ function EditableInput({ value, onChange, placeholder = "What’s happening?" })
 	);
 }
 
-
 function CreatePost({ dialogRef }) {
 	const [images, setImages] = useState([]);
 	const [dragOver, setDragOver] = useState(false);
 	const [text, setText] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const navigate = useNavigate();
+	const { user } = useAuth();
+	const token = localStorage.getItem("token");
 
 	const closeDialog = () => {
 		dialogRef.current?.close();
 		setImages([]);
 		setText("");
+		setIsSubmitting(false);
 	};
 
 	const handleFiles = (files) => {
@@ -71,28 +78,41 @@ function CreatePost({ dialogRef }) {
 	};
 
 	const handleSubmit = async () => {
+		setIsSubmitting(true);
 		try {
 			const formData = new FormData();
-			formData.append("text", text);
-			images.forEach((img, idx) => {
+			formData.append("content", text);
+			images.forEach((img) => {
 				if (img.file) {
 					formData.append("images", img.file);
 				}
 			});
 
-			const response = await fetch("/api/posts/createpost", {
+			const response = await fetch("/api/v1/posts/createpost", {
 				method: "POST",
 				body: formData,
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
 			});
 
 			if (response.ok) {
-				console.log("Post submitted successfully");
+				toast.success("Your post has been published 🚀");
 				closeDialog();
+
+				navigate("/profile", {
+					state: { justPosted: true },
+				});
 			} else {
-				console.error("Failed to submit post");
+				const data = await response.json();
+				toast.error(`Post failed: ${data?.error || "Something went wrong"}`);
+				console.error("Failed to submit post", data);
 			}
 		} catch (err) {
 			console.error("Error submitting post:", err);
+			toast.error("Something went wrong while submitting the post.");
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -119,7 +139,11 @@ function CreatePost({ dialogRef }) {
 					</button>
 				</div>
 
-				<EditableInput value={text} onChange={setText} placeholder="What’s happening?" />
+				<EditableInput
+					value={text}
+					onChange={setText}
+					placeholder="What’s happening?"
+				/>
 
 				{images.length > 0 && (
 					<div className="flex overflow-x-auto gap-4 mt-4 mb-4 scrollbar-none">
@@ -157,10 +181,10 @@ function CreatePost({ dialogRef }) {
 
 					<button
 						onClick={handleSubmit}
-						disabled={!text.trim() && images.length === 0}
+						disabled={isSubmitting || (!text.trim() && images.length === 0)}
 						className="bg-violet-600 text-white px-6 py-2 rounded-full font-semibold disabled:opacity-40"
 					>
-						Post
+						{isSubmitting ? "Posting..." : "Post"}
 					</button>
 				</div>
 			</div>

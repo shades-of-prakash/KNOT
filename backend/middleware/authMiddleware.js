@@ -11,11 +11,11 @@ const protect = (req, res, next) => {
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		req.user = decoded;
+		req.user = decoded; // decoded = { id: userId, iat, exp }
 		next();
 	} catch (err) {
-		console.error(err);
-		res.status(401).json({ error: "Token is invalid or expired" });
+		console.error("JWT Error:", err);
+		return res.status(401).json({ error: "Token is invalid or expired" });
 	}
 };
 

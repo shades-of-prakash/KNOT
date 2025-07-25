@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
 		queryKey: ["me"],
 		queryFn: async () => {
 			if (!token) return null;
-			const res = await fetch("/api/auth/me", {
+			const res = await fetch("/api/v1/auth/me", {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -24,13 +24,14 @@ export const AuthProvider = ({ children }) => {
 		refetchOnWindowFocus: false,
 	});
 	const loginMutation = useMutation({
-		mutationFn: async ({ email, password }) => {
+		mutationFn: async ({ username, password }) => {
 			try {
 				const res = await fetch("/api/v1/auth/login", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email, password }),
+					body: JSON.stringify({ username, password }),
 				});
+				console.log(res);
 
 				let data = {};
 				try {
@@ -42,6 +43,7 @@ export const AuthProvider = ({ children }) => {
 				if (!res.ok) throw new Error(data.error || "Login failed");
 				return data;
 			} catch (err) {
+				console.log(err);
 				throw new Error(err.message || "Network error");
 			}
 		},
@@ -52,14 +54,13 @@ export const AuthProvider = ({ children }) => {
 		},
 	});
 
-	// ✅ Register mutation with safe error handling
 	const registerMutation = useMutation({
-		mutationFn: async ({ username, password }) => {
+		mutationFn: async ({ username, email, password }) => {
 			try {
 				const res = await fetch("/api/v1/auth/register", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, password }),
+					body: JSON.stringify({ username, email, password }),
 				});
 
 				let data = {};
